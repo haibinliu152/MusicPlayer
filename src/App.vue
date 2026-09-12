@@ -9,6 +9,8 @@ import PlayerControls from './components/PlayerControls.vue'
 import Spectrum from './components/Spectrum.vue'
 import LyricPanel from './components/LyricPanel.vue'
 import NetworkModal from './components/NetworkModal.vue'
+import logoCD from './assets/CD.svg'
+
 
 const store = usePlayerStore()
 const activeTab = ref('playlist')
@@ -21,8 +23,8 @@ const isDragging = ref(false)
 let dragDepth = 0
 
 const cover = computed(() => store.currentTrack?.cover || '')
-const title = computed(() => store.currentTrack?.name || '未播放')
-const artist = computed(() => store.currentTrack?.artist || '——')
+const title = computed(() => store.currentTrack?.name || '')
+const artist = computed(() => store.currentTrack?.artist || '')
 
 onMounted(() => store.init())
 
@@ -90,7 +92,9 @@ watch(
       <!-- 顶部栏 -->
       <header class="topbar">
         <div class="brand">
-          <div class="brand-logo"><Icon name="music" :size="20" /></div>
+          <div class="brand-logo">
+            <img :src="logoCD" alt="logo" />
+          </div>
           <span class="brand-name gradient-text">音乐播放器</span>
         </div>
 
@@ -251,15 +255,15 @@ watch(
   gap: 10px;
 }
 .brand-logo {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  background: var(--gradient);
+  /* width: 38px;
+  height: 38px; */
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.4);
+}
+.brand-logo >img{
+  width: 48px;
 }
 .brand-name {
   font-size: 20px;
