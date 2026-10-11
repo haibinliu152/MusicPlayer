@@ -1,16 +1,21 @@
 <script setup>
-import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
+import { onMounted, onBeforeUnmount, ref, watch, watchEffect, computed } from 'vue'
 import { audioEngine } from '../audio/engine'
-
+import { usePlayerStore } from '../store/player'
+const store = usePlayerStore();
 const props = defineProps({
   mode: { type: String, default: 'bar' } // bar | ring
 })
-
+let blurVal =30;
 const canvasRef = ref(null)
 let rafId = null
-let freqData = new Uint8Array(128)
+let freqData = new Uint8Array(110)
 let resizeObserver = null
-
+let ctx = null
+let w = 0;
+let h = 0;
+let canvas = null;
+const dpr = window.devicePixelRatio || 1;
 // 与 style.css 中渐变一致的三个主题色
 const COLORS = [
   [124, 58, 237], // #7c3aed
@@ -19,7 +24,7 @@ const COLORS = [
 ]
 
 // 频谱灵敏度：幂次放大弱信号并叠加增益，值越大越灵敏
-const SENSITIVITY = 1.8
+const SENSITIVITY = 0.87
 function boost(v) {
   return Math.min(1, Math.pow(v, 0.7) * SENSITIVITY)
 }
@@ -40,12 +45,12 @@ function resize() {
   const rect = canvas.getBoundingClientRect()
   const dpr = window.devicePixelRatio || 1
   canvas.width = rect.width * dpr
-  canvas.height = rect.height * dpr
+  canvas.height = (rect.height) * dpr
 }
 
 function drawBar(ctx, w, h) {
-  const bars = 64
-  const gap = 3
+  const bars = 45
+  const gap = 0
   const bw = (w - gap * (bars - 1)) / bars
   audioEngine.getFrequencyData(freqData)
 
@@ -74,7 +79,7 @@ function drawRing(ctx, w, h) {
   const cx = w / 2
   const cy = h / 2
   const maxRadius = Math.min(w, h) / 2 - 8
-  const inner = maxRadius * 0.45
+  const inner = maxRadius * 0.25
   audioEngine.getFrequencyData(freqData)
 
   ctx.lineCap = 'round'
@@ -82,10 +87,10 @@ function drawRing(ctx, w, h) {
     const idx = Math.floor((i / bars) * freqData.length)
     const v = boost(freqData[idx] / 255)
     const angle = (i / bars) * Math.PI * 2 - Math.PI / 2
-    const len = v * (maxRadius - inner)
+    const len = v * (maxRadius - inner) * 1.4
     const [r, g, b] = sampleColor(i / bars)
     ctx.strokeStyle = `rgba(${r | 0}, ${g | 0}, ${b | 0}, ${0.35 + v * 0.65})`
-    ctx.lineWidth = 3
+    ctx.lineWidth = 10
     ctx.beginPath()
     const x1 = cx + Math.cos(angle) * inner
     const y1 = cy + Math.sin(angle) * inner
@@ -98,26 +103,36 @@ function drawRing(ctx, w, h) {
 }
 
 function render() {
-  const canvas = canvasRef.value
-  if (!canvas) return
-  const ctx = canvas.getContext('2d')
-  const dpr = window.devicePixelRatio || 1
+  if(!ctx) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height)
   ctx.save()
   ctx.scale(dpr, dpr)
-  const w = canvas.width / dpr
-  const h = canvas.height / dpr
+  ctx.filter = "blur(" + blurVal + "px)"
   if (props.mode === 'ring') drawRing(ctx, w, h)
   else drawBar(ctx, w, h)
   ctx.restore()
-  rafId = requestAnimationFrame(render)
+  if(store.isPlaying){
+    rafId = requestAnimationFrame(render)
+  }
 }
-
+watchEffect(() => {
+  if (store.isPlaying) {
+    render()
+  } else {
+    cancelAnimationFrame(rafId)
+  }
+})
 onMounted(() => {
   resize()
   resizeObserver = new ResizeObserver(() => resize())
   resizeObserver.observe(canvasRef.value)
-  render()
+  canvas = canvasRef.value;
+  if (canvas) {
+    ctx = canvas.getContext('2d')
+    w = canvas.width / dpr
+    h = canvas.height / dpr;
+    render()
+  }
 })
 
 onBeforeUnmount(() => {

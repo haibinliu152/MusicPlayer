@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { usePlayerStore } from '../store/player'
 import { formatTime } from '../utils/lyric'
 import Icon from './Icon.vue'
@@ -7,17 +7,15 @@ import Icon from './Icon.vue'
 const store = usePlayerStore()
 const progressRef = ref(null)
 const dragging = ref(false)
-
+const mute = ref(false);
 const progressPercent = computed(() =>
   store.duration ? (store.currentTime / store.duration) * 100 : 0
 )
-
 const volumeIcon = computed(() => {
   if (store.volume <= 0.001) return 'volume-mute'
   if (store.volume < 0.5) return 'volume-low'
   return 'volume'
 })
-
 const modeIcon = computed(() => {
   if (store.playMode === 'shuffle') return 'shuffle'
   if (store.playMode === 'loop') return 'loop'
@@ -52,7 +50,13 @@ function onUp() {
 }
 
 function onVolume(e) {
-  store.setVolume(Number(e.target.value))
+  let value = undefined;
+  if (typeof e === 'number') {
+    value = e;
+  } else if (typeof e === "object") {
+    value = Number(e.target.value);
+  }
+  store.setVolume(value)
 }
 // 鼠标滚轮调整音量
 function wheelVolume(e) {
@@ -60,13 +64,32 @@ function wheelVolume(e) {
   if (e.deltaY === 0) return;
   else if (e.deltaY < 0) {
     if (val >= 1) return;
-    store.setVolume(store.volume += 0.01)
-  } else {
-    // 减少
+    onVolume(store.volume += 0.01)
+  } else {// 减少
     if (val <= 0) return;
-    store.setVolume(store.volume -= 0.01)
+    onVolume(store.volume -= 0.01)
   }
 }
+// 静音设置
+let __vol = 0;
+function setQuilt() {
+  const vol = store.volume;
+  if(vol!==0 && !mute.value){
+    __vol = vol;
+  }
+  mute.value = !mute.value;
+  if (mute.value) {
+    onVolume(0);
+  } else {
+    onVolume(__vol);
+  }
+}
+window.addEventListener("keydown", (e) => {
+  if (e.code === "Space" && e.repeat) {
+    e.preventDefault();
+    store.togglePlay();
+  }
+});
 </script>
 
 <template>
@@ -81,14 +104,12 @@ function wheelVolume(e) {
         <span>{{ formatTime(store.duration) }}</span>
       </div>
     </div>
-
     <div class="controls-row">
       <div class="left">
         <button class="icon-btn mode-btn" :title="modeTitle" @click="store.cyclePlayMode()">
           <Icon :name="modeIcon" :size="19" />
         </button>
       </div>
-
       <div class="center">
         <button class="icon-btn" title="上一首" @click="store.playPrev()">
           <Icon name="prev" :size="22" />
@@ -103,14 +124,13 @@ function wheelVolume(e) {
           <Icon name="stop" :size="20" />
         </button>
       </div>
-
       <div class="right">
-        <button class="icon-btn" title="静音" @click="store.setVolume(store.volume > 0 ? 0 : 0.75)">
+        <button class="icon-btn" title="静音" @click="setQuilt">
           <Icon :name="volumeIcon" :size="20" />
         </button>
         <input id="volume-slider" class="volume-slider" type="range" min="0" @wheel.prevent="wheelVolume" max="1"
           step="0.01" :value="store.volume" @input="onVolume" />
-        <label for="volume-slider">{{  (Math.abs(store.volume) * 100).toFixed(0) }}%</label>
+        <label for="volume-slider" style="width:40px ;">{{ (Math.abs(store.volume) * 100).toFixed(0) }}%</label>
       </div>
     </div>
   </div>
@@ -224,5 +244,11 @@ function wheelVolume(e) {
   width: 90px;
   accent-color: var(--accent-2);
   cursor: pointer;
+}
+
+@media (max-width: 460px) {
+  .right {
+    display: none;
+  }
 }
 </style>

@@ -20,7 +20,7 @@ const icons = {
   sequence: '<path d="M4 6h12M4 12h12M4 18h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17 14l3 3-3 3M20 17H16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
   loop: '<path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>',
   music: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
-  'theme-light': '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  'theme-light': '<circle cx="12" cy="12" r="8"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
   'theme-dark': '<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>',
   'spectrum-bar': '<path d="M4 20V10M9 20V4M14 20v-8M19 20V7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>',
   'spectrum-ring': '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3.5"/><path d="M12 9v-2.5M12 17.5V15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',

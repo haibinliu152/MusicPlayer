@@ -108,6 +108,11 @@ export class AudioEngine {
     this.isPlaying = false
   }
 
+  _play(){
+    this.pausedAt = this.getCurrentTime();
+    this.play();
+  }
+
   stop() {
     this.pausedAt = 0
     this._stopSource()

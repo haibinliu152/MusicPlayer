@@ -43,9 +43,13 @@ export const usePlayerStore = defineStore('player', {
 
   actions: {
     init() {
-      try{
-        audioEngine.onEnded = () => this._onEnded()
-      }catch(e){
+      try {
+         audioEngine.onEnded = () => {
+            if(this._onEnded){
+              this._onEnded();
+            }
+          }
+      } catch (e) {
         return;
       }
       audioEngine.setVolume(this.volume)
@@ -107,7 +111,13 @@ export const usePlayerStore = defineStore('player', {
         this.isPlaying = true
       }
     },
-
+    play(){
+      if (!this.currentTrack) return
+      audioEngine.unlock()
+      this._clearError()
+      audioEngine._play()
+      this.isPlaying = true
+    },
     stop() {
       audioEngine.stop()
       this.isPlaying = false
@@ -143,12 +153,13 @@ export const usePlayerStore = defineStore('player', {
       this.currentTime = time
     },
 
-    setVolume(v) {
-      this.volume = v
-      audioEngine.setVolume(v)
-      localStorage.setItem('mp-volume', String(v))
+    setVolume(v) { // 设置音量
+      if (v!==undefined) {
+        this.volume = v
+        audioEngine.setVolume(v)
+        localStorage.setItem('mp-volume', String(v))
+      }
     },
-
     cyclePlayMode() {
       const modes = ['sequence', 'shuffle', 'loop']
       const idx = modes.indexOf(this.playMode)

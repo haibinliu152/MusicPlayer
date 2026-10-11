@@ -2,7 +2,7 @@
   --accent-1: #7c3aed;
   --accent-2: #ec4899;
   --accent-3: #06b6d4;
-  --gradient: linear-gradient(135deg, #7c3aed 0%, #ec4899 50%, #06b6d4 100%);
+  --gradient: linear-gradient(360deg, #7c3aed 0%, #ec4899 50%);
 }
 
 :root[data-theme='dark'] {
@@ -15,7 +15,7 @@
   --text: #f4f5fb;
   --text-dim: rgba(244, 245, 251, 0.55);
   --text-faint: rgba(244, 245, 251, 0.35);
-  --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  --shadow: 0 5px 5px rgba(0, 0, 0, 0.25);
 }
 
 :root[data-theme='light'] {
@@ -28,7 +28,7 @@
   --text: #1a1f36;
   --text-dim: rgba(26, 31, 54, 0.55);
   --text-faint: rgba(26, 31, 54, 0.35);
-  --shadow: 0 20px 60px rgba(90, 100, 160, 0.22);
+  --shadow: 0 5px 5px rgba(90, 100, 160, 0.22);
 }
 
 * {

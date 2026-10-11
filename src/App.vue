@@ -95,13 +95,12 @@ watch(
           <div class="brand-logo">
             <img :src="logoCD" alt="logo" />
           </div>
-          <span class="brand-name gradient-text">音乐播放器</span>
+          <span class="brand-name gradient-text">简答</span>
         </div>
 
         <div class="topbar-actions">
           <button class="btn" @click="spectrumMode = spectrumMode === 'bar' ? 'ring' : 'bar'">
             <Icon :name="spectrumMode === 'bar' ? 'spectrum-ring' : 'spectrum-bar'" :size="16" />
-            <span>{{ spectrumMode === 'bar' ? '环形频谱' : '柱状频谱' }}</span>
           </button>
           <button class="btn" @click="store.toggleTheme()">
             <Icon :name="store.theme === 'dark' ? 'theme-light' : 'theme-dark'" :size="16" />
@@ -112,16 +111,11 @@ watch(
       <!-- 主体 -->
       <main class="main">
         <!-- 左侧：列表/历史 -->
-        <aside
-          class="sidebar glass"
-          @dragenter.prevent="onDragEnter"
-          @dragover.prevent="onDragOver"
-          @dragleave.prevent="onDragLeave"
-          @drop.prevent="onDrop"
-        >
+        <aside class="sidebar glass" @dragenter.prevent="onDragEnter" @dragover.prevent="onDragOver"
+          @dragleave.prevent="onDragLeave" @drop.prevent="onDrop">
           <div v-if="isDragging" class="drop-overlay">
             <Icon name="folder" :size="36" />
-            <p>松开以导入音乐 / 歌词 / 封面</p>
+            <p>导入音乐 / 歌词 / 封面</p>
           </div>
 
           <div class="sidebar-actions">
@@ -133,29 +127,14 @@ watch(
               <Icon name="link" :size="16" />
               <span>网络音频</span>
             </button>
-            <input
-              ref="fileInput"
-              type="file"
-              accept="audio/*,.lrc,image/*"
-              multiple
-              hidden
-              @change="onLocalFiles"
-            />
+            <input ref="fileInput" type="file" accept="audio/*,.lrc,image/*" multiple hidden @change="onLocalFiles" />
           </div>
 
           <div class="tabs">
-            <button
-              class="tab"
-              :class="{ active: activeTab === 'playlist' }"
-              @click="activeTab = 'playlist'"
-            >
+            <button class="tab" :class="{ active: activeTab === 'playlist' }" @click="activeTab = 'playlist'">
               播放列表
             </button>
-            <button
-              class="tab"
-              :class="{ active: activeTab === 'history' }"
-              @click="activeTab = 'history'"
-            >
+            <button class="tab" :class="{ active: activeTab === 'history' }" @click="activeTab = 'history'">
               历史记录
             </button>
           </div>
@@ -184,27 +163,21 @@ watch(
               <p class="song-artist">{{ artist }}</p>
               <div v-if="store.currentTrack" class="stage-actions">
                 <button class="btn" @click="onImportLyric">
-                  <Icon name="lyrics" :size="16" />
                   <span>导入歌词</span>
                 </button>
-                <input
-                  ref="lyricInput"
-                  type="file"
-                  accept=".lrc"
-                  hidden
-                  @change="onLyricFile"
-                />
+                <input ref="lyricInput" type="file" accept=".lrc" hidden @change="onLyricFile" />
               </div>
             </div>
           </div>
 
           <div class="stage-lyrics glass">
-            <div class="lyric-body">
-              <LyricPanel />
-            </div>
             <div class="spectrum-box">
               <Spectrum :mode="spectrumMode" />
             </div>
+            <div class="lyric-body">
+              <LyricPanel />
+            </div>
+
           </div>
         </section>
       </main>
@@ -230,6 +203,7 @@ watch(
   height: 100%;
   overflow: hidden;
 }
+
 .shell {
   position: relative;
   z-index: 1;
@@ -249,11 +223,13 @@ watch(
   justify-content: space-between;
   padding: 0 6px;
 }
+
 .brand {
   display: flex;
   align-items: center;
   gap: 10px;
 }
+
 .brand-logo {
   /* width: 38px;
   height: 38px; */
@@ -262,14 +238,17 @@ watch(
   align-items: center;
   justify-content: center;
 }
-.brand-logo >img{
+
+.brand-logo>img {
   width: 48px;
 }
+
 .brand-name {
   font-size: 20px;
   font-weight: 800;
   letter-spacing: 1px;
 }
+
 .topbar-actions {
   display: flex;
   gap: 10px;
@@ -283,12 +262,14 @@ watch(
   gap: 14px;
   min-height: 0;
 }
+
 .sidebar {
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
 }
+
 .drop-overlay {
   position: absolute;
   inset: 0;
@@ -305,29 +286,35 @@ watch(
   backdrop-filter: blur(4px);
   pointer-events: none;
 }
+
 .drop-overlay p {
   font-size: 14px;
 }
+
 .sidebar-actions {
   display: flex;
   gap: 10px;
   padding: 16px 16px 12px;
 }
+
 .primary-btn {
   background: var(--gradient);
   color: #fff;
   border: none;
   flex: 1;
 }
+
 .primary-btn:hover {
   filter: brightness(1.1);
 }
+
 .tabs {
   display: flex;
   gap: 4px;
   padding: 0 16px;
   border-bottom: 1px solid var(--border);
 }
+
 .tab {
   border: none;
   background: transparent;
@@ -338,10 +325,12 @@ watch(
   position: relative;
   transition: color 0.2s ease;
 }
+
 .tab.active {
   color: var(--text);
   font-weight: 600;
 }
+
 .tab.active::after {
   content: '';
   position: absolute;
@@ -352,6 +341,7 @@ watch(
   background: var(--gradient);
   border-radius: 2px;
 }
+
 .tab-body {
   flex: 1;
   min-height: 0;
@@ -365,16 +355,19 @@ watch(
   gap: 14px;
   min-height: 0;
 }
+
 .stage-top {
   display: flex;
   align-items: center;
   gap: 30px;
   padding: 24px;
-  min-height: 0;
+  min-height: 174px;
 }
+
 .disc-wrap {
   flex-shrink: 0;
 }
+
 .disc {
   position: relative;
   width: 150px;
@@ -384,9 +377,11 @@ watch(
   padding: 12px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
 }
+
 .disc.spinning {
   animation: spin 12s linear infinite;
 }
+
 .disc-cover {
   width: 100%;
   height: 100%;
@@ -398,11 +393,13 @@ watch(
   justify-content: center;
   color: var(--text-dim);
 }
+
 .disc-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
+
 .disc-hole {
   position: absolute;
   top: 50%;
@@ -414,6 +411,7 @@ watch(
   background: var(--bg-1);
   border: 3px solid var(--accent-2);
 }
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -426,6 +424,7 @@ watch(
   display: flex;
   flex-direction: column;
 }
+
 .song-title {
   font-size: 24px;
   font-weight: 800;
@@ -433,36 +432,39 @@ watch(
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .song-artist {
   color: var(--text-dim);
   margin-top: 4px;
   font-size: 14px;
 }
+
 .stage-actions {
   margin-top: 12px;
   display: flex;
   gap: 10px;
 }
+
 .spectrum-box {
   flex-shrink: 0;
-  height: 110px;
-  margin: 0 16px 16px;
-  filter: blur(12px) saturate(160%);
-  -webkit-filter: blur(12px) saturate(160%);
+  height: 100%;
+  box-sizing: border-box;
   position: absolute;
-  z-index: -1;
   bottom: 0;
-  width: calc(100% - 32px);
+  top:0;
+  width: calc(100%);
 }
 
 .stage-lyrics {
   flex: 1;
-  min-height: 0;
+  min-height: 120px;
   display: flex;
+
   flex-direction: column;
   overflow: hidden;
   position: relative;
 }
+
 .lyric-body {
   flex: 1;
   min-height: 0;
@@ -472,6 +474,7 @@ watch(
 /* 底部 */
 .bottombar {
   padding: 14px 24px;
+  overflow: hidden;
 }
 
 /* 提示 */
@@ -488,10 +491,12 @@ watch(
   border-color: rgba(236, 72, 153, 0.4);
   max-width: 80vw;
 }
+
 .toast-enter-active,
 .toast-leave-active {
   transition: all 0.3s ease;
 }
+
 .toast-enter-from,
 .toast-leave-to {
   opacity: 0;
@@ -502,13 +507,17 @@ watch(
   .main {
     grid-template-columns: 1fr;
   }
+
   .sidebar {
     max-height: 220px;
   }
+
   .stage-top {
     flex-direction: column;
     text-align: center;
+    min-height: 312px;
   }
+
   .song-title {
     text-align: center;
   }

@@ -117,6 +117,11 @@ watch(
     if (scrollRef.value) scrollRef.value.scrollTop = 0
   }
 )
+function jumpTo(val){
+  if(!val) return;
+  store.seek(val)
+  store.play()
+}
 </script>
 
 <template>
@@ -125,42 +130,35 @@ watch(
       <p class="empty-title">暂无歌词</p>
       <p class="empty-sub">加载音频时可同时选择 .lrc 歌词文件，或为网络音频填写歌词地址</p>
     </div>
-
+    
     <template v-else>
       <div class="lyric-tools">
         <button class="font-btn" title="减小字号" @click="zoomFont(-1)">A−</button>
         <span class="font-size">{{ fontSize }}</span>
         <button class="font-btn" title="增大字号" @click="zoomFont(1)">A+</button>
       </div>
-
+      
       <div ref="scrollRef" class="lyric-scroll" @scroll.passive="onScroll">
         <div class="lyric-spacer" :style="{ height: contentHeight + 'px' }">
           <div class="lyric-window" :style="{ transform: `translateY(${offsetY}px)` }">
-            <div
-              v-for="item in visibleLines"
-              :key="item.index"
-              class="lyric-line"
-              :class="{ active: item.index === activeIndex }"
-              :style="{
+            <div v-for="item in visibleLines" :key="item.index" class="lyric-line"
+              :class="{ active: item.index === activeIndex }" :style="{
                 height: itemHeight + 'px',
                 fontSize: (item.index === activeIndex ? fontSize * 1.25 : fontSize) + 'px'
-              }"
-            >
+              }">
               <template v-if="item.index === activeIndex">
-                <span
-                  v-for="(w, j) in item.line.words"
-                  :key="j"
-                  class="lyric-word"
-                  :class="{
-                    played: store.currentTime >= w.end,
-                    current: store.currentTime >= w.start && store.currentTime < w.end
-                  }"
-                >
+                <span v-for="(w, j) in item.line.words" :key="j" class="lyric-word" :class="{
+                  played: store.currentTime >= w.end,
+                  current: store.currentTime >= w.start && store.currentTime < w.end
+                }">
                   <span class="word-base">{{ w.text }}</span>
-                  <span class="word-fill" :style="{ '--p': wordProgress(w) + '%' }">{{ w.text }}</span>
+                  <span class="word-fill"  :style="{ '--p': wordProgress(w) + '%' }">{{ w.text
+                    }}</span>
                 </span>
               </template>
               <span v-else class="lyric-word plain">{{ item.line.text }}</span>
+              <div @dblclick="jumpTo(item.line['time'])" class="lryic-click-area" title="双击可跳转当前播放">
+              </div>
             </div>
           </div>
         </div>
@@ -174,6 +172,13 @@ watch(
   position: relative;
   height: 100%;
   overflow: hidden;
+  
+}
+.lryic-click-area{
+  height: 50%;
+  cursor: pointer;
+  width: 100%;
+  position: absolute;
 }
 .lyric-tools {
   position: absolute;
@@ -184,6 +189,7 @@ watch(
   align-items: center;
   gap: 6px;
 }
+
 .font-btn {
   width: 28px;
   height: 28px;
@@ -199,24 +205,30 @@ watch(
   justify-content: center;
   transition: color 0.2s ease, background 0.2s ease;
 }
+
 .font-btn:hover {
   color: var(--text);
   background: var(--panel-strong);
 }
+
 .font-size {
   font-size: 12px;
   color: var(--text-dim);
   min-width: 22px;
   text-align: center;
 }
+
 .lyric-scroll {
   height: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
 }
+
 .lyric-spacer {
   position: relative;
   width: 100%;
 }
+
 .lyric-window {
   position: absolute;
   top: 0;
@@ -224,6 +236,7 @@ watch(
   right: 0;
   will-change: transform;
 }
+
 .lyric-line {
   display: flex;
   align-items: center;
@@ -232,6 +245,7 @@ watch(
   text-align: center;
   line-height: 1.4;
   padding: 0 16px;
+  position: relative;
   color: var(--text-dim);
   transition: color 0.35s ease, font-size 0.35s ease;
   font-weight: 500;
@@ -239,28 +253,36 @@ watch(
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .lyric-line.active {
   color: var(--text);
   font-weight: 700;
   transform: scale(1.1);
 }
+
 .lyric-word {
+  user-select: none;
+  cursor: pointer;
   transition: transform 0.2s ease;
   position: relative;
   display: inline-block;
 }
+
 .lyric-word.plain {
   display: inline;
 }
+
 .word-base {
   color: var(--text-dim);
   white-space: nowrap;
   transition: color 0.2s ease;
 }
+
 .lyric-word.current .word-base {
   color: var(--text);
   text-shadow: 0 0 16px rgba(236, 72, 153, 0.35);
 }
+
 .word-fill {
   position: absolute;
   inset: 0;
@@ -278,6 +300,7 @@ watch(
   mask-size: var(--p, 0%) 100%;
   transition: -webkit-mask-size 0.2s linear, mask-size 0.2s linear;
 }
+
 .lyric-empty {
   height: 100%;
   display: flex;
@@ -287,10 +310,12 @@ watch(
   gap: 10px;
   color: var(--text-faint);
 }
+
 .empty-title {
   font-size: 18px;
   color: var(--text-dim);
 }
+
 .empty-sub {
   font-size: 13px;
   max-width: 320px;
