@@ -16,8 +16,7 @@ const viewportH = ref(0)
 const scrollTop = ref(0)
 const fontSize = ref(Number(localStorage.getItem('mp-lyric-font')) || 16)
 
-// 行高随字号联动（约 3.5 倍字高，保留舒适行距）
-const itemHeight = computed(() => Math.round(fontSize.value * 3.5))
+const itemHeight = computed(() => Math.round(fontSize.value * 2.6))
 
 let ro = null
 function measure() {
@@ -117,8 +116,8 @@ watch(
     if (scrollRef.value) scrollRef.value.scrollTop = 0
   }
 )
-function jumpTo(val){
-  if(!val) return;
+function jumpTo(val) {
+  if (!val) return;
   store.seek(val)
   store.play()
 }
@@ -130,14 +129,14 @@ function jumpTo(val){
       <p class="empty-title">暂无歌词</p>
       <p class="empty-sub">加载音频时可同时选择 .lrc 歌词文件，或为网络音频填写歌词地址</p>
     </div>
-    
+
     <template v-else>
       <div class="lyric-tools">
         <button class="font-btn" title="减小字号" @click="zoomFont(-1)">A−</button>
         <span class="font-size">{{ fontSize }}</span>
         <button class="font-btn" title="增大字号" @click="zoomFont(1)">A+</button>
       </div>
-      
+
       <div ref="scrollRef" class="lyric-scroll" @scroll.passive="onScroll">
         <div class="lyric-spacer" :style="{ height: contentHeight + 'px' }">
           <div class="lyric-window" :style="{ transform: `translateY(${offsetY}px)` }">
@@ -152,8 +151,8 @@ function jumpTo(val){
                   current: store.currentTime >= w.start && store.currentTime < w.end
                 }">
                   <span class="word-base">{{ w.text }}</span>
-                  <span class="word-fill"  :style="{ '--p': wordProgress(w) + '%' }">{{ w.text
-                    }}</span>
+                  <span class="word-fill" :style="{ '--p': wordProgress(w) + '%' }">{{ w.text
+                  }}</span>
                 </span>
               </template>
               <span v-else class="lyric-word plain">{{ item.line.text }}</span>
@@ -167,56 +166,59 @@ function jumpTo(val){
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .lyric-panel {
   position: relative;
   height: 100%;
   overflow: hidden;
-  
-}
-.lryic-click-area{
-  height: 50%;
-  cursor: pointer;
-  width: 100%;
-  position: absolute;
-}
-.lyric-tools {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+
+  .lryic-click-area {
+    height: 50%;
+    cursor: pointer;
+    width: 100%;
+    position: absolute;
+
+  }
+
+  .font-size {
+    font-size: 12px;
+    color: var(--text-dim);
+    min-width: 22px;
+    text-align: center;
+  }
+
+  .lyric-tools {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .font-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 13px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s ease, background 0.2s ease;
+
+      :hover {
+        color: var(--text);
+        background: var(--panel-strong);
+      }
+    }
+  }
 }
 
-.font-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--panel);
-  color: var(--text-dim);
-  cursor: pointer;
-  font-size: 13px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s ease, background 0.2s ease;
-}
-
-.font-btn:hover {
-  color: var(--text);
-  background: var(--panel-strong);
-}
-
-.font-size {
-  font-size: 12px;
-  color: var(--text-dim);
-  min-width: 22px;
-  text-align: center;
-}
 
 .lyric-scroll {
   height: 100%;
@@ -252,20 +254,28 @@ function jumpTo(val){
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: 2px;
 }
 
 .lyric-line.active {
   color: var(--text);
   font-weight: 700;
   transform: scale(1.1);
+
+  .word-base {
+    color: var(--text);
+    text-shadow: 0 0 16px rgba(236, 72, 153, 0.35);
+  }
 }
 
 .lyric-word {
   user-select: none;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform 0.1s ease;
   position: relative;
   display: inline-block;
+  margin-left: 1px;
+  margin-right: 1px;
 }
 
 .lyric-word.plain {
@@ -278,10 +288,6 @@ function jumpTo(val){
   transition: color 0.2s ease;
 }
 
-.lyric-word.current .word-base {
-  color: var(--text);
-  text-shadow: 0 0 16px rgba(236, 72, 153, 0.35);
-}
 
 .word-fill {
   position: absolute;

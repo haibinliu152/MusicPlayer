@@ -43,6 +43,12 @@ body,
   height: 100%;
 }
 
+html[data-theme=light] {
+  .primary-btn:hover {
+    color: black;
+  }
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
     'Microsoft YaHei', sans-serif;
@@ -61,10 +67,12 @@ body {
   filter: blur(90px);
   opacity: 0.55;
 }
+
 .bg-blobs span {
   position: absolute;
   border-radius: 50%;
 }
+
 .bg-blobs .b1 {
   width: 45vw;
   height: 45vw;
@@ -72,6 +80,7 @@ body {
   top: -15vw;
   background: radial-gradient(circle, var(--accent-1), transparent 70%);
 }
+
 .bg-blobs .b2 {
   width: 40vw;
   height: 40vw;
@@ -79,6 +88,7 @@ body {
   top: 10vh;
   background: radial-gradient(circle, var(--accent-2), transparent 70%);
 }
+
 .bg-blobs .b3 {
   width: 42vw;
   height: 42vw;
@@ -113,9 +123,11 @@ body {
   transition: all 0.2s ease;
   user-select: none;
 }
+
 .btn:hover {
   background: var(--panel-strong);
 }
+
 .btn svg {
   width: 16px;
   height: 16px;
@@ -136,9 +148,11 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
 }
+
 .icon-btn:hover {
   background: var(--panel-strong);
 }
+
 .icon-btn svg {
   width: 20px;
   height: 20px;
@@ -149,13 +163,16 @@ body {
   width: 8px;
   height: 8px;
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-faint);
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }

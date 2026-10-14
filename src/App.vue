@@ -10,8 +10,8 @@ import Spectrum from './components/Spectrum.vue'
 import LyricPanel from './components/LyricPanel.vue'
 import NetworkModal from './components/NetworkModal.vue'
 import logoCD from './assets/CD.svg'
-
-
+import Ico from './assets/CD.ico'
+import NetWorkContent from './components/NetWorkContent.vue'
 const store = usePlayerStore()
 const activeTab = ref('playlist')
 const spectrumMode = ref('bar')
@@ -20,13 +20,12 @@ const fileInput = ref(null)
 const lyricInput = ref(null)
 const toast = ref('')
 const isDragging = ref(false)
+const showNetworkPage = ref(false)
 let dragDepth = 0
 
 const cover = computed(() => store.currentTrack?.cover || '')
 const title = computed(() => store.currentTrack?.name || '')
 const artist = computed(() => store.currentTrack?.artist || '')
-
-onMounted(() => store.init())
 
 function onLocalFiles(e) {
   const files = Array.from(e.target.files || [])
@@ -78,6 +77,17 @@ watch(
     }
   }
 )
+onMounted(() => {
+  const link = document.createElement("link");
+  link.href = Ico;
+  link.setAttribute("rel", "shortcut icon");
+  document.head.appendChild(link)
+  store.init()
+})
+function onSwitch(e){
+  if(typeof e !== 'boolean') return;
+  showNetworkPage.value=e;
+}
 </script>
 
 <template>
@@ -174,17 +184,17 @@ watch(
             <div class="spectrum-box">
               <Spectrum :mode="spectrumMode" />
             </div>
-            <div class="lyric-body">
+            <NetWorkContent v-if="showNetworkPage" />
+            <div class="lyric-body" v-else>
               <LyricPanel />
             </div>
-
           </div>
         </section>
       </main>
 
       <!-- 底部控制栏 -->
       <footer class="bottombar glass">
-        <PlayerControls />
+        <PlayerControls @onSwitch="onSwitch" />
       </footer>
     </div>
 
@@ -197,61 +207,66 @@ watch(
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .app {
   position: relative;
   height: 100%;
   overflow: hidden;
-}
-
-.shell {
-  position: relative;
-  z-index: 1;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 16px;
-  gap: 14px;
-  max-width: 1440px;
-  margin: 0 auto;
-}
-
-/* 顶部栏 */
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 6px;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.brand-logo {
-  /* width: 38px;
-  height: 38px; */
-  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-}
 
-.brand-logo>img {
-  width: 48px;
-}
+  .shell {
+    position: relative;
+    z-index: 1;
+    max-height: 1080px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    gap: 14px;
+    max-width: 1440px;
+    margin: 0 auto;
 
-.brand-name {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: 1px;
-}
+    /* 顶部栏 */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6px;
 
-.topbar-actions {
-  display: flex;
-  gap: 10px;
+      .topbar-actions {
+        display: flex;
+        gap: 5px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .brand-logo {
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          img {
+            width: 48px;
+          }
+        }
+
+        .brand-name {
+          font-size: 20px;
+          font-weight: 800;
+          letter-spacing: 1px;
+        }
+
+
+      }
+    }
+  }
 }
 
 /* 主体 */
@@ -261,14 +276,22 @@ watch(
   grid-template-columns: 300px 1fr;
   gap: 14px;
   min-height: 0;
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .sidebar-actions {
+    display: flex;
+    gap: 10px;
+    padding: 16px 16px 12px;
+  }
 }
 
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  position: relative;
-}
+
 
 .drop-overlay {
   position: absolute;
@@ -285,17 +308,13 @@ watch(
   border-radius: 20px;
   backdrop-filter: blur(4px);
   pointer-events: none;
+
+  p {
+    font-size: 14px;
+  }
 }
 
-.drop-overlay p {
-  font-size: 14px;
-}
 
-.sidebar-actions {
-  display: flex;
-  gap: 10px;
-  padding: 16px 16px 12px;
-}
 
 .primary-btn {
   background: var(--gradient);
@@ -324,22 +343,22 @@ watch(
   cursor: pointer;
   position: relative;
   transition: color 0.2s ease;
-}
 
-.tab.active {
-  color: var(--text);
-  font-weight: 600;
-}
+  &.active {
+    color: var(--text);
+    font-weight: 600;
 
-.tab.active::after {
-  content: '';
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: -1px;
-  height: 2px;
-  background: var(--gradient);
-  border-radius: 2px;
+    &::after {
+      content: '';
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: -1px;
+      height: 2px;
+      background: var(--gradient);
+      border-radius: 2px;
+    }
+  }
 }
 
 .tab-body {
@@ -361,43 +380,40 @@ watch(
   align-items: center;
   gap: 30px;
   padding: 24px;
-  min-height: 174px;
-}
+  min-height: 84px;
+  max-height: 100px;
 
-.disc-wrap {
-  flex-shrink: 0;
-}
+  .disc-wrap {
+    flex-shrink: 0;
 
-.disc {
-  position: relative;
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  background: conic-gradient(#111, #333, #111);
-  padding: 12px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
-}
+    .disc {
+      position: relative;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: conic-gradient(#111, #333, #111);
+      padding: 12px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
 
-.disc.spinning {
-  animation: spin 12s linear infinite;
-}
+      .disc-cover {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        overflow: hidden;
+        background: var(--panel-strong);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-dim);
 
-.disc-cover {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  overflow: hidden;
-  background: var(--panel-strong);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-dim);
-}
-
-.disc-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+    }
+  }
 }
 
 .disc-hole {
@@ -410,6 +426,10 @@ watch(
   border-radius: 50%;
   background: var(--bg-1);
   border: 3px solid var(--accent-2);
+}
+
+.spinning {
+  animation: spin 12s linear infinite;
 }
 
 @keyframes spin {
@@ -448,10 +468,12 @@ watch(
 .spectrum-box {
   flex-shrink: 0;
   height: 100%;
+  z-index: -1;
+  pointer-events: none;
   box-sizing: border-box;
   position: absolute;
   bottom: 0;
-  top:0;
+  top: 0;
   width: calc(100%);
 }
 

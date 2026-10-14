@@ -6,7 +6,7 @@ const store = usePlayerStore();
 const props = defineProps({
   mode: { type: String, default: 'bar' } // bar | ring
 })
-let blurVal =30;
+let blurVal = 34;
 const canvasRef = ref(null)
 let rafId = null
 let freqData = new Uint8Array(110)
@@ -15,7 +15,7 @@ let ctx = null
 let w = 0;
 let h = 0;
 let canvas = null;
-const dpr = window.devicePixelRatio || 1;
+let dpr = 1;
 // 与 style.css 中渐变一致的三个主题色
 const COLORS = [
   [124, 58, 237], // #7c3aed
@@ -43,17 +43,20 @@ function resize() {
   const canvas = canvasRef.value
   if (!canvas) return
   const rect = canvas.getBoundingClientRect()
-  const dpr = window.devicePixelRatio || 1
-  canvas.width = rect.width * dpr
-  canvas.height = (rect.height) * dpr
+  dpr = window.devicePixelRatio;
+  let rw = rect.width * dpr;
+  let rh = rect.height * dpr;
+  w = rw;
+  h = rh;
+  canvas.width = w
+  canvas.height = h
 }
 
 function drawBar(ctx, w, h) {
   const bars = 45
-  const gap = 0
+  const gap = -1
   const bw = (w - gap * (bars - 1)) / bars
   audioEngine.getFrequencyData(freqData)
-
   const grad = ctx.createLinearGradient(0, h, 0, 0)
   grad.addColorStop(0, '#06b6d4')
   grad.addColorStop(0.5, '#ec4899')
@@ -66,9 +69,9 @@ function drawBar(ctx, w, h) {
     const bh = Math.max(3, v * (h - 10))
     const x = i * (bw + gap)
     const y = h - bh
-    ctx.globalAlpha = 0.35 + v * 0.65
+    ctx.globalAlpha = 1
     ctx.beginPath()
-    ctx.roundRect(x, y, bw, bh, 4)
+    ctx.roundRect(x, y, bw, bh, [10, 10, 0, 0])
     ctx.fill()
   }
   ctx.globalAlpha = 1
@@ -103,15 +106,14 @@ function drawRing(ctx, w, h) {
 }
 
 function render() {
-  if(!ctx) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  if (!ctx) return;
+  ctx.clearRect(0, 0, w, h)
   ctx.save()
-  ctx.scale(dpr, dpr)
   ctx.filter = "blur(" + blurVal + "px)"
   if (props.mode === 'ring') drawRing(ctx, w, h)
   else drawBar(ctx, w, h)
   ctx.restore()
-  if(store.isPlaying){
+  if (store.isPlaying) {
     rafId = requestAnimationFrame(render)
   }
 }

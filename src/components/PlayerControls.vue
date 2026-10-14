@@ -1,9 +1,10 @@
 <script setup>
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref } from 'vue'
 import { usePlayerStore } from '../store/player'
 import { formatTime } from '../utils/lyric'
 import Icon from './Icon.vue'
 
+const emit = defineEmits(["onSwitch"])
 const store = usePlayerStore()
 const progressRef = ref(null)
 const dragging = ref(false)
@@ -74,7 +75,7 @@ function wheelVolume(e) {
 let __vol = 0;
 function setQuilt() {
   const vol = store.volume;
-  if(vol!==0 && !mute.value){
+  if (vol !== 0 && !mute.value) {
     __vol = vol;
   }
   mute.value = !mute.value;
@@ -90,10 +91,17 @@ window.addEventListener("keydown", (e) => {
     store.togglePlay();
   }
 });
+let s = false;
+function changeEvent(e) {
+  let checked = !s;
+  emit("onSwitch",checked)
+  s = !s;
+}
 </script>
 
 <template>
   <div class="controls">
+    <label class="btn" style="width: 80px;" @click="changeEvent" for="test">切换</label>
     <div class="progress-wrap" ref="progressRef" @mousedown="onDown">
       <div class="progress-track">
         <div class="progress-fill" :style="{ width: progressPercent + '%' }" />

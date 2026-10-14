@@ -86,8 +86,8 @@ export class AudioEngine {
     source.connect(this.gain)
 
     this._endedFired = false
+    // 仅在自然播完时回调（stop/seek 会先把 onended 置空）
     source.onended = () => {
-      // 仅在自然播完时回调（stop/seek 会先把 onended 置空）
       if (this.source === source && !this._endedFired) {
         this._endedFired = true
         this.isPlaying = false
